@@ -34,7 +34,7 @@ namespace MonsterBuilder.Controllers
       var rv = new Monster();
       var data = htmlDoc
         .DocumentNode
-        .SelectSingleNode("//div[@class='statblock']")
+        .SelectSingleNode("//span[@id='ctl00_MainContent_DataListFeats_ctl00_Label1']")
         .ChildNodes
         .Where(w =>
         {
@@ -47,16 +47,17 @@ namespace MonsterBuilder.Controllers
         Console.WriteLine($"{item.InnerText}");
         Console.WriteLine("-------");
       }
-      Console.WriteLine("============================");
+      rv.Name = data[0].InnerText;
+      //   Console.WriteLine("============================");
 
-      var monsterBar = data[0].ChildNodes.Select(s => s.InnerText).ToList();
-      rv.Name = monsterBar[0];
-      rv.ChallengeRating = monsterBar[1].Replace("CR", "").Trim();
+      //   var monsterBar = data[0].ChildNodes.Select(s => s.InnerText).ToList();
+      //   rv.Name = monsterBar[0];
+      //   rv.ChallengeRating = monsterBar[1].Replace("CR", "").Trim();
 
-      var summary = data[1].ChildNodes.Where(w => w.InnerText.Trim().Length > 0).ToList();
-      var alignmentAndSize = summary[1].InnerText.Split(' ');
-      rv.Alignment = alignmentAndSize[0];
-      rv.Size = alignmentAndSize[1];
+      //   var summary = data[1].ChildNodes.Where(w => w.InnerText.Trim().Length > 0).ToList();
+      //   var alignmentAndSize = summary[1].InnerText.Split(' ');
+      //   rv.Alignment = alignmentAndSize[0];
+      //   rv.Size = alignmentAndSize[1];
 
       //   foreach (var item in summary.ChildNodes.Where(w => w.InnerHtml.Trim().Length > 0))
       //   {
@@ -68,11 +69,11 @@ namespace MonsterBuilder.Controllers
       return rv;
     }
 
-    // use https://aonprd.com/MonsterDisplay.aspx?ItemName=Hag%20Eye%20Ooze instead, d20pfsrd is dumb
+    // use  instead, d20pfsrd is dumb
     [HttpGet("{name}")]
     public async Task<ActionResult> GetBuildStatusAsync(string name)
     {
-      var monster = await GetMonster($"https://www.d20pfsrd.com/bestiary/monster-listings/humanoids/giants/{name}/");
+      var monster = await GetMonster($"https://aonprd.com/MonsterDisplay.aspx?ItemName={name}");
 
       return Ok(new { monster });
     }
