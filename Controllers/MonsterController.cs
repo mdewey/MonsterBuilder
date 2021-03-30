@@ -21,13 +21,9 @@ namespace MonsterBuilder.Controllers
     private async Task<Monster> GetMonster(string url)
     {
       Console.WriteLine(url);
-
-
       var response = await client.GetAsync(url);
       response.EnsureSuccessStatusCode();
       string responseBody = await response.Content.ReadAsStringAsync();
-      // Above three lines can be replaced with new helper method below
-      // string responseBody = await client.GetStringAsync(uri);
       var htmlDoc = new HtmlDocument();
       htmlDoc.LoadHtml(responseBody);
 
@@ -56,36 +52,12 @@ namespace MonsterBuilder.Controllers
       rv.Alignment = splat[0];
       rv.Size = splat[1];
       rv.Type = String.Join(String.Empty, details.Skip(rv.Alignment.Length + rv.Size.Length + 2)).Split($"(")[0];
+      rv.Init = data[9].InnerHtml.Replace(";", String.Empty);
+      rv.Senses = data[11].InnerHtml;
       if (details.Contains($"("))
       {
         rv.SubType = details.Substring(details.IndexOf($"("));
       }
-      //   foreach (var item in details)
-      //   {
-      //     Console.WriteLine("item-----");
-
-
-      //     Console.WriteLine(item);
-
-      //   }
-      //   Console.WriteLine("============================");
-
-      //   var monsterBar = data[0].ChildNodes.Select(s => s.InnerText).ToList();
-      //   rv.Name = monsterBar[0];
-      //   rv.ChallengeRating = monsterBar[1].Replace("CR", "").Trim();
-
-      //   var summary = data[1].ChildNodes.Where(w => w.InnerText.Trim().Length > 0).ToList();
-      //   var alignmentAndSize = summary[1].InnerText.Split(' ');
-      //   rv.Alignment = alignmentAndSize[0];
-      //   rv.Size = alignmentAndSize[1];
-
-      //   foreach (var item in summary.ChildNodes.Where(w => w.InnerHtml.Trim().Length > 0))
-      //   {
-      //     Console.WriteLine($"{item.InnerText.Trim()}");
-      //     Console.WriteLine("~~~~~");
-      //   }
-
-
       return rv;
     }
 
