@@ -27,38 +27,9 @@ namespace MonsterBuilder.Controllers
       var htmlDoc = new HtmlDocument();
       htmlDoc.LoadHtml(responseBody);
 
-      var rv = new Monster();
-      var data = htmlDoc
-        .DocumentNode
-        .SelectSingleNode("//span[@id='ctl00_MainContent_DataListFeats_ctl00_Label1']")
-        .ChildNodes
-        .Where(w =>
-        {
-          return !String.IsNullOrEmpty(w.InnerHtml.Trim());
-        }).Select(s => s).ToList();
+      var monster = new Builders.MonsterFactory(responseBody).ShowData().Build();
 
-      var i = 0;
-      foreach (var item in data)
-      {
-        Console.WriteLine($"{i}=>{item.InnerText}");
-        Console.WriteLine("-------");
-        i++;
-      }
-      rv.Name = data[0].InnerText;
-      rv.ChallengeRating = data[2].InnerText.Split(" ").Last();
-      // N Huge magical beast (aquatic, augmented animal)
-      var details = data[7].InnerText;
-      var splat = details.Split(' ');
-      rv.Alignment = splat[0];
-      rv.Size = splat[1];
-      rv.Type = String.Join(String.Empty, details.Skip(rv.Alignment.Length + rv.Size.Length + 2)).Split($"(")[0];
-      rv.Init = data[9].InnerHtml.Replace(";", String.Empty);
-      rv.Senses = data[11].InnerHtml;
-      if (details.Contains($"("))
-      {
-        rv.SubType = details.Substring(details.IndexOf($"("));
-      }
-      return rv;
+      return monster;
     }
 
     // use  instead, d20pfsrd is dumb
