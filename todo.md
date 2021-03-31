@@ -12,3 +12,6 @@ melee
 ranged
 space
 reach
+**Other**
+SQ freeze
+Special Abilities
