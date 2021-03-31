@@ -28,7 +28,14 @@ namespace MonsterBuilder.Models.Monster
         return this.GetModifier(this.Constitution);
       }
     }
-
+    public int Intelligence { get; set; }
+    public int IntMod
+    {
+      get
+      {
+        return this.GetModifier(this.Intelligence);
+      }
+    }
     public int Wisdom { get; set; }
     public int WisMod
     {
@@ -37,6 +44,8 @@ namespace MonsterBuilder.Models.Monster
         return this.GetModifier(this.Wisdom);
       }
     }
+
+
 
     public int Charisma { get; set; }
     public int ChaMod
@@ -47,16 +56,14 @@ namespace MonsterBuilder.Models.Monster
       }
     }
 
-    public int Intelligence { get; set; }
-    public int IntMod
-    {
-      get
-      {
-        return this.GetModifier(this.Intelligence);
-      }
-    }
-
     private int GetModifier(int score) => (score - 10) / 2;
+
+
+    public int BaseAttackBonus { get; set; }
+
+    public string CMB { get; set; }
+    public string CMD { get; set; }
+
 
 
   }

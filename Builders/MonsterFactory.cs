@@ -46,11 +46,12 @@ namespace MonsterBuilder.Builders
       return rv;
     }
 
-    private int parseAbilityScore(string raw)
+    private int parseInt(string raw)
     {
 
       var rv = 0;
-      Int32.TryParse(raw.Replace(",", ""), out rv);
+      var str = raw.Replace(",", "").Replace("+", "").Replace(";", "").Trim();
+      Int32.TryParse(str, out rv);
       return rv;
     }
 
@@ -62,12 +63,15 @@ namespace MonsterBuilder.Builders
           .Where(w => w.text == "Statistics")
           .First().index;
       Console.WriteLine("stats index is" + startIndex);
-      monster.BaseStats.Strength = this.parseAbilityScore(data[startIndex + 2].InnerHtml);
-      monster.BaseStats.Dexterity = this.parseAbilityScore(data[startIndex + 4].InnerHtml);
-      monster.BaseStats.Constitution = this.parseAbilityScore(data[startIndex + 6].InnerHtml);
-      monster.BaseStats.Intelligence = this.parseAbilityScore(data[startIndex + 8].InnerHtml);
-      monster.BaseStats.Wisdom = this.parseAbilityScore(data[startIndex + 10].InnerHtml);
-      monster.BaseStats.Charisma = this.parseAbilityScore(data[startIndex + 12].InnerHtml);
+      monster.BaseStats.Strength = this.parseInt(data[startIndex + 2].InnerHtml);
+      monster.BaseStats.Dexterity = this.parseInt(data[startIndex + 4].InnerHtml);
+      monster.BaseStats.Constitution = this.parseInt(data[startIndex + 6].InnerHtml);
+      monster.BaseStats.Intelligence = this.parseInt(data[startIndex + 8].InnerHtml);
+      monster.BaseStats.Wisdom = this.parseInt(data[startIndex + 10].InnerHtml);
+      monster.BaseStats.Charisma = this.parseInt(data[startIndex + 12].InnerHtml);
+      monster.BaseStats.BaseAttackBonus = this.parseInt(data[startIndex + 14].InnerHtml);
+      monster.BaseStats.CMB = data[startIndex + 16].InnerHtml.Trim();
+      monster.BaseStats.CMD = data[startIndex + 18].InnerHtml.Trim();
       return monster;
     }
 
