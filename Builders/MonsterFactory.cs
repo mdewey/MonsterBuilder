@@ -11,8 +11,6 @@ namespace MonsterBuilder.Builders
     public HtmlDocument htmlDoc { get; set; } = new HtmlDocument();
     public List<HtmlNode> data { get; set; } = new List<HtmlNode>();
 
-
-
     public MonsterFactory(string html)
     {
       htmlDoc.LoadHtml(html);
@@ -43,25 +41,61 @@ namespace MonsterBuilder.Builders
       var rv = new Monster();
       rv = this.BuildSummary(rv);
       rv = this.BuildBaseStats(rv);
+      rv = this.BuildAbilities(rv);
       return rv;
     }
 
     private int parseInt(string raw)
     {
-
       var rv = 0;
       var str = raw.Replace(",", "").Replace("+", "").Replace(";", "").Trim();
       Int32.TryParse(str, out rv);
       return rv;
     }
 
+    private int? findStartIndex(string needle) => data
+          .Select((item, index) => new { index, item, text = item.InnerHtml })
+          .Where(w => w.text == needle).FirstOrDefault()?.index;
+
+    private Monster BuildAbilities(Monster monster)
+    {
+      var startIndex = findStartIndex("Feats").GetValueOrDefault();
+      startIndex++;
+      var findingFeats = true;
+      while (findingFeats)
+      {
+        monster.Abilities.Feats.Add(data[startIndex].InnerHtml);
+        if (data[startIndex + 1].InnerHtml.Contains(","))
+        {
+          startIndex += 2;
+        }
+        else
+        {
+          findingFeats = false;
+        }
+      }
+
+      var skillIndex = findStartIndex("Skills").GetValueOrDefault();
+      monster.Abilities.Skills = data[skillIndex + 1].InnerHtml;
+      var racialModifierIndex = findStartIndex("Racial Modifiers");
+      if (racialModifierIndex.HasValue)
+      {
+        monster.Abilities.RacialModifiers = data[racialModifierIndex.GetValueOrDefault() + 1].InnerHtml;
+      }
+
+      var languageIndex = findStartIndex("Languages");
+      if (languageIndex.HasValue)
+      {
+        monster.Abilities.Languages = data[languageIndex.GetValueOrDefault() + 1].InnerHtml;
+      }
+
+      return monster;
+    }
+
     private Monster BuildBaseStats(Monster monster)
     {
       // find index of base stats
-      var startIndex = data
-          .Select((item, index) => new { index, item, text = item.InnerHtml })
-          .Where(w => w.text == "Statistics")
-          .First().index;
+      var startIndex = findStartIndex("Statistics").GetValueOrDefault();
       Console.WriteLine("stats index is" + startIndex);
       monster.BaseStats.Strength = this.parseInt(data[startIndex + 2].InnerHtml);
       monster.BaseStats.Dexterity = this.parseInt(data[startIndex + 4].InnerHtml);
@@ -80,13 +114,14 @@ namespace MonsterBuilder.Builders
       monster.Summary.Name = data[0].InnerText;
       monster.Summary.ChallengeRating = data[2].InnerText.Split(" ").Last();
       // N Huge magical beast (aquatic, augmented animal)
-      var details = data[7].InnerText;
+      var initIndex = this.findStartIndex("Init").GetValueOrDefault();
+      var details = data[initIndex - 1].InnerText;
       var splat = details.Split(' ');
       monster.Summary.Alignment = splat[0];
       monster.Summary.Size = splat[1];
       monster.Summary.Type = String.Join(String.Empty, details.Skip(monster.Summary.Alignment.Length + monster.Summary.Size.Length + 2)).Split($"(")[0];
-      monster.Summary.Init = data[9].InnerHtml.Replace(";", String.Empty);
-      monster.Summary.Senses = data[11].InnerHtml;
+      monster.Summary.Init = data[initIndex + 1].InnerHtml.Replace(";", String.Empty);
+      monster.Summary.Senses = data[initIndex + 3].InnerHtml;
       if (details.Contains($"("))
       {
         monster.Summary.SubType = details.Substring(details.IndexOf($"("));
