@@ -10,6 +10,9 @@ namespace MonsterBuilder.Models.Monster
 
     public Defenses Defenses { get; set; } = new Defenses();
 
+    public string FullLink { get; set; }
+
+
 
 
   }

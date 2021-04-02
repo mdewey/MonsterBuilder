@@ -36,8 +36,9 @@ namespace MonsterBuilder.Controllers
     [HttpGet("{name}")]
     public async Task<ActionResult> GetBuildStatusAsync(string name)
     {
-      var monster = await GetMonster($"https://aonprd.com/MonsterDisplay.aspx?ItemName={name}");
-
+      var url = $"https://aonprd.com/MonsterDisplay.aspx?ItemName={name}";
+      var monster = await GetMonster(url);
+      monster.FullLink = url;
       return Ok(new { monster });
     }
   }
