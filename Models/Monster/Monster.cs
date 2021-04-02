@@ -8,5 +8,9 @@ namespace MonsterBuilder.Models.Monster
 
     public Abilities Abilities { get; set; } = new Abilities();
 
+    public Defenses Defenses { get; set; } = new Defenses();
+
+
+
   }
 }

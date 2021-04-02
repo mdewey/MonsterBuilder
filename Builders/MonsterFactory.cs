@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using MonsterBuilder.Models.Monster;
 
@@ -42,6 +43,7 @@ namespace MonsterBuilder.Builders
       rv = this.BuildSummary(rv);
       rv = this.BuildBaseStats(rv);
       rv = this.BuildAbilities(rv);
+      rv = this.BuildDefenses(rv);
       return rv;
     }
 
@@ -96,7 +98,6 @@ namespace MonsterBuilder.Builders
     {
       // find index of base stats
       var startIndex = findStartIndex("Statistics").GetValueOrDefault();
-      Console.WriteLine("stats index is" + startIndex);
       monster.BaseStats.Strength = this.parseInt(data[startIndex + 2].InnerHtml);
       monster.BaseStats.Dexterity = this.parseInt(data[startIndex + 4].InnerHtml);
       monster.BaseStats.Constitution = this.parseInt(data[startIndex + 6].InnerHtml);
@@ -125,6 +126,50 @@ namespace MonsterBuilder.Builders
       if (details.Contains($"("))
       {
         monster.Summary.SubType = details.Substring(details.IndexOf($"("));
+      }
+      return monster;
+    }
+
+    private Monster BuildDefenses(Monster monster)
+    {
+      // AC 28, touch 10, flat-footed 27 (+1 Dex, +18 natural, –1 size)
+      var startIndex = findStartIndex("AC").GetValueOrDefault();
+      var allAc = data[startIndex + 1].InnerHtml;
+      var firstSplit = allAc.Replace(")", "").Split("(");
+      monster.Defenses.AcFormula = firstSplit.Last();
+      var secondSplit = firstSplit.First().Split(",");
+      monster.Defenses.AC = Int32.Parse(secondSplit[0].Trim());
+      monster.Defenses.TouchAc = Int32.Parse(secondSplit[1].Replace("touch", "").Trim());
+      monster.Defenses.FlatFlootedAc = Int32.Parse(secondSplit[2].Replace("flat-footed ", "").Trim());
+
+      // hp 138 (12d12+60)
+      var hpIndex = findStartIndex("hp").GetValueOrDefault();
+      var hpData = data[hpIndex + 1].InnerHtml.Trim().Split(" ");
+      Console.WriteLine(hpData[0]);
+
+
+      monster.Defenses.HP = int.Parse(hpData[0].Trim());
+      monster.Defenses.HpFormula = hpData[1].Replace("(", "").Replace(")", "");
+      // Fort +13, Ref +9, Will +14
+      var fortIndex = findStartIndex("Fort").GetValueOrDefault();
+      monster.Defenses.Fort = int.Parse(data[fortIndex + 1].InnerHtml.Replace(",", ""));
+      monster.Defenses.Reflex = int.Parse(data[fortIndex + 3].InnerHtml.Replace(",", ""));
+      monster.Defenses.Will = int.Parse(data[fortIndex + 5].InnerHtml.Replace(",", ""));
+      // DR 5/magic; Immune paralysis, sleep; SR 21
+      var drIndex = findStartIndex("DR");
+      if (drIndex.HasValue)
+      {
+        monster.Defenses.DamageReduction = data[drIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", "");
+      }
+      var srIndex = findStartIndex("SR");
+      if (srIndex.HasValue)
+      {
+        monster.Defenses.SpellResistance = int.Parse(data[srIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", ""));
+      }
+      var immuneIndex = findStartIndex("Immune");
+      if (immuneIndex.HasValue)
+      {
+        monster.Defenses.Immune = data[immuneIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", "");
       }
       return monster;
     }
