@@ -44,8 +44,10 @@ namespace MonsterBuilder.Builders
       rv = this.BuildBaseStats(rv);
       rv = this.BuildAbilities(rv);
       rv = this.BuildDefenses(rv);
+      rv = this.BuildSpeed(rv);
       return rv;
     }
+
 
     private int parseInt(string raw)
     {
@@ -58,6 +60,14 @@ namespace MonsterBuilder.Builders
     private int? findStartIndex(string needle) => data
           .Select((item, index) => new { index, item, text = item.InnerHtml })
           .Where(w => w.text == needle).FirstOrDefault()?.index;
+
+    private Monster BuildSpeed(Monster rv)
+    {
+      var index = findStartIndex("Speed").GetValueOrDefault();
+      index++;
+      rv.Movements = data[index].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+      return rv;
+    }
 
     private Monster BuildAbilities(Monster monster)
     {
@@ -150,11 +160,11 @@ namespace MonsterBuilder.Builders
 
       monster.Defenses.HP = int.Parse(hpData[0].Trim());
       monster.Defenses.HpFormula = hpData[1].Replace("(", "").Replace(")", "");
-      // Fort +13, Ref +9, Will +14
+      // Fort +13, Ref +9, Will +14;+2 against mind affecting
       var fortIndex = findStartIndex("Fort").GetValueOrDefault();
-      monster.Defenses.Fort = int.Parse(data[fortIndex + 1].InnerHtml.Replace(",", ""));
-      monster.Defenses.Reflex = int.Parse(data[fortIndex + 3].InnerHtml.Replace(",", ""));
-      monster.Defenses.Will = int.Parse(data[fortIndex + 5].InnerHtml.Replace(",", ""));
+      monster.Defenses.Fort = data[fortIndex + 1].InnerHtml.Replace(",", "").Trim();
+      monster.Defenses.Reflex = data[fortIndex + 3].InnerHtml.Replace(",", "").Trim();
+      monster.Defenses.Will = data[fortIndex + 5].InnerHtml.Replace(",", "").Trim();
       // DR 5/magic; Immune paralysis, sleep; SR 21
       var drIndex = findStartIndex("DR");
       if (drIndex.HasValue)

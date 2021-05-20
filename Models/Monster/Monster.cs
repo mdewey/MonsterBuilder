@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace MonsterBuilder.Models.Monster
 {
   public class Monster
@@ -9,6 +11,8 @@ namespace MonsterBuilder.Models.Monster
     public Abilities Abilities { get; set; } = new Abilities();
 
     public Defenses Defenses { get; set; } = new Defenses();
+
+    public List<string> Movements { get; set; } = new List<string>();
 
     public string FullLink { get; set; }
 

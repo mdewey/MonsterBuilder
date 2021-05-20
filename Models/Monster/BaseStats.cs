@@ -45,8 +45,6 @@ namespace MonsterBuilder.Models.Monster
       }
     }
 
-
-
     public int Charisma { get; set; }
     public int ChaMod
     {

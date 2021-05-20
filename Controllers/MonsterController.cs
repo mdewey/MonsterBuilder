@@ -32,11 +32,10 @@ namespace MonsterBuilder.Controllers
       return monster;
     }
 
-    // use  instead, d20pfsrd is dumb
     [HttpGet("{name}")]
     public async Task<ActionResult> GetBuildStatusAsync(string name)
     {
-      var url = $"https://aonprd.com/MonsterDisplay.aspx?ItemName={name}";
+      var url = $"https://aonprd.com/MonsterDisplay.aspx?ItemName={char.ToUpper(name[0]) + name.Substring(1)}";
       var monster = await GetMonster(url);
       monster.FullLink = url;
       return Ok(new { monster });

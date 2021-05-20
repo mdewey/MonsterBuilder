@@ -14,11 +14,11 @@ namespace MonsterBuilder.Models.Monster
 
     public string HpFormula { get; set; }
 
-    public int Fort { get; set; }
+    public string Fort { get; set; }
 
-    public int Reflex { get; set; }
+    public string Reflex { get; set; }
 
-    public int Will { get; set; }
+    public string Will { get; set; }
 
     public string DamageReduction { get; set; }
 
