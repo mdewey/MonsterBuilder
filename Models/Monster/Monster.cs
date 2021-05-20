@@ -15,9 +15,6 @@ namespace MonsterBuilder.Models.Monster
     public List<string> Movements { get; set; } = new List<string>();
 
     public string FullLink { get; set; }
-
-
-
-
+    public Attacks Attacks { get; set; } = new Attacks();
   }
 }

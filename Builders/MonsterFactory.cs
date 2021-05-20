@@ -45,8 +45,10 @@ namespace MonsterBuilder.Builders
       rv = this.BuildAbilities(rv);
       rv = this.BuildDefenses(rv);
       rv = this.BuildSpeed(rv);
+      rv = this.BuildAttacks(rv);
       return rv;
     }
+
 
 
     private int parseInt(string raw)
@@ -69,6 +71,25 @@ namespace MonsterBuilder.Builders
       return rv;
     }
 
+
+    private Monster BuildAttacks(Monster rv)
+    {
+      var melee = findStartIndex("Melee");
+      if (melee.HasValue)
+      {
+        melee++;
+        rv.Attacks.Melee = data[melee.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+      }
+
+      var ranged = findStartIndex("Ranged");
+      if (ranged.HasValue)
+      {
+        ranged++;
+        rv.Attacks.Ranged = data[ranged.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+      }
+      return rv;
+
+    }
     private Monster BuildAbilities(Monster monster)
     {
       var startIndex = findStartIndex("Feats").GetValueOrDefault();
