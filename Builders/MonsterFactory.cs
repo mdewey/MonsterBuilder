@@ -158,6 +158,20 @@ namespace MonsterBuilder.Builders
       {
         monster.Summary.SubType = details.Substring(details.IndexOf($"("));
       }
+
+      var space = findStartIndex("Space");
+      if (space.HasValue)
+      {
+        monster.Summary.Space =
+          data[space.GetValueOrDefault() + 1]
+          .InnerHtml
+          .Replace(".", "")
+          .Replace(",", "").Trim();
+      }
+      else
+      {
+        monster.Summary.Space = "5ft";
+      }
       return monster;
     }
 

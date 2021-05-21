@@ -17,5 +17,8 @@ namespace MonsterBuilder.Models.Monster
     public string Init { get; set; }
 
     public string Senses { get; set; }
+    public string Space { get; set; }
+
+
   }
 }
