@@ -62,7 +62,7 @@ namespace MonsterBuilder.Builders
       {
         var otherStart = otherGear.GetValueOrDefault() + 1;
         var Ecology = findStartIndex("Ecology").GetValueOrDefault();
-        while (otherStart < Ecology)
+        while (otherStart < Ecology || otherStart >= otherGear.GetValueOrDefault() + 50)
         {
           var raw = Regex
             .Split(data[otherStart].InnerHtml, "(?<![0-9]),")
