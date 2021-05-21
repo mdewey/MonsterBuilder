@@ -16,5 +16,6 @@ namespace MonsterBuilder.Models.Monster
 
     public string FullLink { get; set; }
     public Attacks Attacks { get; set; } = new Attacks();
+    public Gear Gear { get; set; } = new Gear();
   }
 }

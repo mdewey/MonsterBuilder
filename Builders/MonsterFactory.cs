@@ -46,22 +46,39 @@ namespace MonsterBuilder.Builders
       rv = this.BuildDefenses(rv);
       rv = this.BuildSpeed(rv);
       rv = this.BuildAttacks(rv);
+      rv = this.BuildGear(rv);
       return rv;
     }
 
-
-
-    private int parseInt(string raw)
+    private Monster BuildGear(Monster rv)
     {
-      var rv = 0;
-      var str = raw.Replace(",", "").Replace("+", "").Replace(";", "").Trim();
-      Int32.TryParse(str, out rv);
+      var combatGear = findStartIndex("Combat Gear");
+      if (combatGear.HasValue)
+      {
+        rv.Gear.Combat = data[combatGear.GetValueOrDefault() + 1].InnerHtml.Split(',').ToList();
+      }
+      var otherGear = findStartIndex("Other Gear");
+      if (otherGear.HasValue)
+      {
+        var otherStart = otherGear.GetValueOrDefault() + 1;
+        var Ecology = findStartIndex("Ecology").GetValueOrDefault();
+        while (otherStart < Ecology)
+        {
+          var raw = Regex
+            .Split(data[otherStart].InnerHtml, "(?<![0-9]),")
+            .Select(s => s.Trim())
+            .Where(w => !String.IsNullOrWhiteSpace(w));
+          rv.Gear.Other.AddRange(raw);
+          otherStart++;
+        }
+
+
+
+
+      }
+
       return rv;
     }
-
-    private int? findStartIndex(string needle) => data
-          .Select((item, index) => new { index, item, text = item.InnerHtml })
-          .Where(w => w.text == needle).FirstOrDefault()?.index;
 
     private Monster BuildSpeed(Monster rv)
     {
@@ -154,7 +171,10 @@ namespace MonsterBuilder.Builders
     private Monster BuildSummary(Monster monster)
     {
       monster.Summary.Name = data[0].InnerText;
-      monster.Summary.ChallengeRating = data[2].InnerText.Split(" ").Last();
+
+      // Ogre King CR 13
+      monster.Summary.ChallengeRating = data.First(f => f.InnerHtml.Contains(" CR ")).InnerText.Split(" ").Last();
+
       // N Huge magical beast (aquatic, augmented animal)
       var initIndex = this.findStartIndex("Init").GetValueOrDefault();
       var details = data[initIndex - 1].InnerText;
@@ -229,5 +249,18 @@ namespace MonsterBuilder.Builders
       return monster;
     }
 
+
+
+    private int parseInt(string raw)
+    {
+      var rv = 0;
+      var str = raw.Replace(",", "").Replace("+", "").Replace(";", "").Trim();
+      Int32.TryParse(str, out rv);
+      return rv;
+    }
+
+    private int? findStartIndex(string needle) => data
+          .Select((item, index) => new { index, item, text = item.InnerHtml })
+          .Where(w => w.text == needle).FirstOrDefault()?.index;
   }
 }
