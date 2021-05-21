@@ -81,6 +81,16 @@ namespace MonsterBuilder.Builders
         rv.Attacks.Melee = data[melee.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
       }
 
+      var reach = findStartIndex("Reach");
+      if (reach.HasValue)
+      {
+        rv.Attacks.Reach = data[reach.GetValueOrDefault() + 1].InnerHtml.Trim();
+      }
+      else
+      {
+        rv.Attacks.Reach = "5ft";
+      }
+
       var ranged = findStartIndex("Ranged");
       if (ranged.HasValue)
       {
