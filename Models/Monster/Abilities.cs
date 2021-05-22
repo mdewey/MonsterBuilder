@@ -12,6 +12,9 @@ namespace MonsterBuilder.Models.Monster
     public string RacialModifiers { get; set; }
 
     public string Languages { get; set; }
+    public string Aura { get; set; }
+
+
 
 
   }

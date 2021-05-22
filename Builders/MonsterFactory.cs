@@ -95,7 +95,17 @@ namespace MonsterBuilder.Builders
       if (melee.HasValue)
       {
         melee++;
-        rv.Attacks.Melee = data[melee.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+        var baseAttack = data[melee.GetValueOrDefault()].InnerHtml;
+        if (!(Regex.Match(baseAttack, "[0-9]d[0-9]").Success))
+        {
+          var attacks = data[melee.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+          attacks.AddRange(data[melee.GetValueOrDefault() + 1].InnerHtml.Split(",").Select(s => s.Trim()));
+          rv.Attacks.Melee.Add(String.Join(' ', attacks));
+        }
+        else
+        {
+          rv.Attacks.Melee = data[melee.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+        }
       }
 
       var reach = findStartIndex("Reach");
@@ -113,6 +123,13 @@ namespace MonsterBuilder.Builders
       {
         ranged++;
         rv.Attacks.Ranged = data[ranged.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+      }
+
+      var special = findStartIndex("Special Attacks");
+      if (special.HasValue)
+      {
+        special++;
+        rv.Attacks.Special = data[special.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
       }
       return rv;
 
@@ -149,6 +166,13 @@ namespace MonsterBuilder.Builders
         monster.Abilities.Languages = data[languageIndex.GetValueOrDefault() + 1].InnerHtml;
       }
 
+      var aura = findStartIndex("Aura");
+      if (aura.HasValue)
+      {
+        monster.Abilities.Aura = $"{data[aura.GetValueOrDefault() + 1].InnerHtml},{data[aura.GetValueOrDefault() + 2].InnerHtml.Trim()}";
+      }
+
+
       return monster;
     }
 
@@ -183,7 +207,7 @@ namespace MonsterBuilder.Builders
       monster.Summary.Size = splat[1];
       monster.Summary.Type = String.Join(String.Empty, details.Skip(monster.Summary.Alignment.Length + monster.Summary.Size.Length + 2)).Split($"(")[0];
       monster.Summary.Init = data[initIndex + 1].InnerHtml.Replace(";", String.Empty);
-      monster.Summary.Senses = data[initIndex + 3].InnerHtml;
+      monster.Summary.Senses = data[initIndex + 3].InnerHtml.Trim();
       if (details.Contains($"("))
       {
         monster.Summary.SubType = details.Substring(details.IndexOf($"("));
@@ -215,13 +239,17 @@ namespace MonsterBuilder.Builders
       var secondSplit = firstSplit.First().Split(",");
       monster.Defenses.AC = Int32.Parse(secondSplit[0].Trim());
       monster.Defenses.TouchAc = Int32.Parse(secondSplit[1].Replace("touch", "").Trim());
-      monster.Defenses.FlatFlootedAc = Int32.Parse(secondSplit[2].Replace("flat-footed ", "").Trim());
+      monster.Defenses.FlatFlootedAc = Int32.Parse(secondSplit[2].Replace("flat-footed ", "").Replace(';', ' ').Trim());
 
       // hp 138 (12d12+60)
       var hpIndex = findStartIndex("hp").GetValueOrDefault();
-      var hpData = data[hpIndex + 1].InnerHtml.Trim().Split(" ");
-      Console.WriteLine(hpData[0]);
-
+      var rawHp = data[hpIndex + 1];
+      var hpData = rawHp.InnerHtml.Trim().Split(" ");
+      var regenData = rawHp.InnerHtml.Split(';');
+      if (regenData.Length > 1)
+      {
+        monster.Defenses.Regeneration = regenData[1].Trim();
+      }
 
       monster.Defenses.HP = int.Parse(hpData[0].Trim());
       monster.Defenses.HpFormula = hpData[1].Replace("(", "").Replace(")", "");
@@ -234,7 +262,7 @@ namespace MonsterBuilder.Builders
       var drIndex = findStartIndex("DR");
       if (drIndex.HasValue)
       {
-        monster.Defenses.DamageReduction = data[drIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", "");
+        monster.Defenses.DamageReduction = data[drIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", "").Trim();
       }
       var srIndex = findStartIndex("SR");
       if (srIndex.HasValue)
@@ -244,7 +272,13 @@ namespace MonsterBuilder.Builders
       var immuneIndex = findStartIndex("Immune");
       if (immuneIndex.HasValue)
       {
-        monster.Defenses.Immune = data[immuneIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", "");
+        monster.Defenses.Immune = data[immuneIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", "").Trim();
+      }
+
+      var resists = findStartIndex("Resist");
+      if (resists.HasValue)
+      {
+        monster.Defenses.Resists = data[resists.GetValueOrDefault() + 1].InnerHtml.Replace(";", "").Trim();
       }
       return monster;
     }

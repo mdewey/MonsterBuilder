@@ -9,6 +9,8 @@ namespace MonsterBuilder.Models.Monster
 
 
     public List<string> Ranged { get; set; } = new List<string>();
+    public List<string> Special { get; set; } = new List<string>();
+
 
   }
 }

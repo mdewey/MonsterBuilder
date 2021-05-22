@@ -26,5 +26,11 @@ namespace MonsterBuilder.Models.Monster
 
     public int SpellResistance { get; set; }
 
+    public string Resists { get; set; }
+
+    public string Regeneration { get; set; }
+
+
+
   }
 }
