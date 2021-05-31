@@ -14,6 +14,8 @@ namespace MonsterBuilder.Models.Monster
     public string Languages { get; set; }
     public string Aura { get; set; }
 
+    public List<AbilityDescription> AbilityDescriptions { get; set; } = new List<AbilityDescription>();
+
 
 
 

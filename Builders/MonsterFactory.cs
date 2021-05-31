@@ -43,10 +43,48 @@ namespace MonsterBuilder.Builders
       rv = this.BuildSummary(rv);
       rv = this.BuildBaseStats(rv);
       rv = this.BuildAbilities(rv);
+      rv = this.BuildSpecialAbilityList(rv);
       rv = this.BuildDefenses(rv);
       rv = this.BuildSpeed(rv);
       rv = this.BuildAttacks(rv);
       rv = this.BuildGear(rv);
+      return rv;
+    }
+
+    private Monster BuildSpecialAbilityList(Monster rv)
+    {
+      var pos = findStartIndex("Special Abilities");
+      if (!pos.HasValue)
+      {
+        return rv;
+      }
+      var position = pos.GetValueOrDefault();
+      position++;
+      var dataPoint = data[position].InnerHtml;
+      while (dataPoint.Trim() != "Description")
+      {
+        Console.WriteLine("*****");
+        Console.WriteLine(dataPoint);
+        AbilityDescription ad = null;
+        if (dataPoint.Contains("(Ex)") || dataPoint.Contains("(Su)") || dataPoint.Contains("(Sp)"))
+        {
+          // dataPoint description
+          ad = new AbilityDescription();
+          ad.Name = dataPoint;
+          position++;
+          var next = data[position + 1].InnerHtml;
+          do
+          {
+
+            dataPoint = data[position].InnerHtml;
+            ad.Description += dataPoint;
+            next = data[position + 1].InnerHtml;
+            position++;
+          } while (!(next.Contains("(Ex)") || next.Contains("(Su)") || next.Contains("(Sp)") || next == "Description"));
+        }
+        rv.Abilities.AbilityDescriptions.Add(ad);
+        dataPoint = data[position].InnerHtml;
+      }
       return rv;
     }
 
