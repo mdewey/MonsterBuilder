@@ -122,14 +122,25 @@ namespace MonsterBuilder.Builders
       if (ranged.HasValue)
       {
         ranged++;
-        rv.Attacks.Ranged = data[ranged.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+        var baseAttack = data[ranged.GetValueOrDefault()].InnerHtml;
+        if (!(Regex.Match(baseAttack, "[0-9]d[0-9]").Success))
+        {
+          var attacks = data[ranged.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+          attacks.AddRange(data[ranged.GetValueOrDefault() + 1].InnerHtml.Split(",").Select(s => s.Trim()));
+          rv.Attacks.Ranged.Add(String.Join(' ', attacks));
+        }
+        else
+        {
+          rv.Attacks.Ranged = data[ranged.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+        }
       }
 
       var special = findStartIndex("Special Attacks");
       if (special.HasValue)
       {
         special++;
-        rv.Attacks.Special = data[special.GetValueOrDefault()].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
+        var baseAttack = data[special.GetValueOrDefault()].InnerHtml;
+        rv.Attacks.Special.AddRange(Regex.Split(baseAttack, @",(?=(((?!\)).)*\()|[^\(\)]*$)", RegexOptions.IgnoreCase).Select(s => s.Trim()));
       }
       return rv;
 
