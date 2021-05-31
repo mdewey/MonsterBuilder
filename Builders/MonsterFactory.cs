@@ -140,7 +140,7 @@ namespace MonsterBuilder.Builders
       {
         special++;
         var baseAttack = data[special.GetValueOrDefault()].InnerHtml;
-        rv.Attacks.Special.AddRange(Regex.Split(baseAttack, @",(?=(((?!\)).)*\()|[^\(\)]*$)", RegexOptions.IgnoreCase).Select(s => s.Trim()));
+        rv.Attacks.Special.AddRange(Regex.Split(baseAttack, @",(?=(((?!\)).)*\()|[^\(\)]*$)", RegexOptions.IgnoreCase).Select(s => s.Trim()).Where(w => !String.IsNullOrEmpty(w)));
       }
       return rv;
 
