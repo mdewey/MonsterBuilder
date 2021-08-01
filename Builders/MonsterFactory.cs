@@ -178,7 +178,32 @@ namespace MonsterBuilder.Builders
       {
         special++;
         var baseAttack = data[special.GetValueOrDefault()].InnerHtml;
-        rv.Attacks.Special.AddRange(Regex.Split(baseAttack, @",(?=(((?!\)).)*\()|[^\(\)]*$)", RegexOptions.IgnoreCase).Select(s => s.Trim()).Where(w => !String.IsNullOrEmpty(w)));
+        var current = "";
+        var inParam = false;
+        foreach (var letter in baseAttack)
+        {
+          if (letter == '(')
+          {
+            inParam = true;
+          }
+          if (letter == ')')
+          {
+            inParam = false;
+          }
+          if (letter == ',' && !inParam)
+          {
+            rv.Attacks.Special.Add(current);
+            current = "";
+          }
+          else
+          {
+            current += letter;
+          }
+        }
+        if (current.Length > 0)
+        {
+          rv.Attacks.Special.Add(current);
+        }
       }
       return rv;
 
