@@ -22,13 +22,13 @@ jobs:
 
     # Build Docker image
     - name: "Deploy the web dyno"
-        uses: "akhileshns/heroku-deploy@v3.12.12"
-        with:
-          docker_heroku_process_type: web
-          heroku_api_key: $HEROKU_API_KEY
-          heroku_app_name: $APP_NAME
-          heroku_email: $ACCOUNT_EMAIL
-          justlogin: true
+      uses: "akhileshns/heroku-deploy@v3.12.12"
+      with:
+        docker_heroku_process_type: web
+        heroku_api_key: $HEROKU_API_KEY
+        heroku_app_name: $APP_NAME
+        heroku_email: $ACCOUNT_EMAIL
+        justlogin: true
 
     - name: "Login to heroku registry"
       run: heroku container:login
