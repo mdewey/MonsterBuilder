@@ -30,11 +30,11 @@ jobs:
           heroku_email: $ACCOUNT_EMAIL
           justlogin: true
 
-      - name: "Login to heroku registry"
-        run: heroku container:login
+    - name: "Login to heroku registry"
+      run: heroku container:login
 
-      - name: "Build and push to heroku registry"
-        run: heroku container:push web --app $APP_NAME
+    - name: "Build and push to heroku registry"
+      run: heroku container:push web --app $APP_NAME
 
-      - name: "Releases the container"
-        run: heroku container:release web --app $APP_NAME
+    - name: "Releases the container"
+      run: heroku container:release web --app $APP_NAME
