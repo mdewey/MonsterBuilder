@@ -4,10 +4,10 @@ on:
   push:
     branches: [ master ]
     
-#set environment variables 
-# env:
-#   HEROKU_API_KEY: ${{ '0db8a637-cdc8-4cf0-957e-ecac4aaff09a' }}
-#   APP_NAME: ${{ 'monster-builder-data-v1' }}
+env:
+  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+  APP_NAME: ${{secrets.APP_NAME }}
+  ACCOUNT_EMAIL: ${{secrets.ACCOUNT_EMAIL}} 
 
 jobs:
       
@@ -23,7 +23,7 @@ jobs:
     # Build Docker image
     - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
       with:
-        heroku_api_key: ${{'0db8a637-cdc8-4cf0-957e-ecac4aaff09a'}}
-        heroku_app_name: "monster-builder-data-v1" #Must be unique in Heroku
-        heroku_email: "mtdewey55@gmail.com"
+        heroku_api_key: $HEROKU_API_KEY
+        heroku_app_name: $APP_NAME
+        heroku_email: $ACCOUNT_EMAIL
         usedocker: true
