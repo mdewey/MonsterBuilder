@@ -28,7 +28,7 @@ jobs:
         heroku_api_key: $HEROKU_API_KEY
         heroku_app_name: $APP_NAME
         heroku_email: $ACCOUNT_EMAIL
-        justlogin: true
+        usedocker: true
 
     - name: "Login to heroku registry"
       run: heroku container:login
