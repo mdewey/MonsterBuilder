@@ -62,7 +62,7 @@ namespace MonsterBuilder.Builders
       var position = pos.GetValueOrDefault();
       position++;
       var dataPoint = data[position].InnerHtml;
-      while (dataPoint.Trim() != "Description")
+      while (dataPoint.Trim() != "Description" && !dataPoint.Contains("Spell-Like Abilities (Sp)"))
       {
         AbilityDescription ad = null;
         if (dataPoint.Contains("(Ex)") || dataPoint.Contains("(Su)") || dataPoint.Contains("(Sp)"))
@@ -74,10 +74,9 @@ namespace MonsterBuilder.Builders
           var next = data[position + 1].InnerHtml;
           do
           {
-
             dataPoint = data[position].InnerHtml;
             ad.Description += dataPoint;
-            next = data[position + 1].InnerHtml;
+            next = data[position + 1]?.InnerHtml;
             position++;
           } while (!(next.Contains("(Ex)") || next.Contains("(Su)") || next.Contains("(Sp)") || next == "Description"));
         }
