@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@v2
 
     # Build Docker image
-   - name: "Deploy the web dyno"
+    - name: "Deploy the web dyno"
         uses: "akhileshns/heroku-deploy@v3.12.12"
         with:
           docker_heroku_process_type: web
