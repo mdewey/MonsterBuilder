@@ -1,6 +1,5 @@
 TODO:
 
-- remove react part
 - Add docker
 - CI/CD
   - docker
