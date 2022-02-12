@@ -3,19 +3,17 @@ name: deploy-to-heroku
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
     
 #set environment variables 
-env:
-  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  APP_NAME: ${{ 'monster-builder-data-v1' }}
+# env:
+#   HEROKU_API_KEY: ${{ '0db8a637-cdc8-4cf0-957e-ecac4aaff09a' }}
+#   APP_NAME: ${{ 'monster-builder-data-v1' }}
 
 jobs:
       
   deploy:
     name: Deploy to Heroku
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
 
     # Clone the repository
@@ -23,11 +21,9 @@ jobs:
       uses: actions/checkout@v2
 
     # Build Docker image
-    - name: Docker build
-      run: docker login --username=_ --password=0db8a637-cdc8-4cf0-957e-ecac4aaff09a registry.heroku.com
-
-    # Push the Docker image to Heroku Container Registry
-    - name: Publish
-      run: |
-        heroku container:push web -a $APP_NAME
-        heroku container:release web -a $APP_NAME
+    - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+      with:
+        heroku_api_key: ${{'0db8a637-cdc8-4cf0-957e-ecac4aaff09a'}}
+        heroku_app_name: "monster-builder-data-v1" #Must be unique in Heroku
+        heroku_email: "mtdewey55@gmail.com"
+        usedocker: true
