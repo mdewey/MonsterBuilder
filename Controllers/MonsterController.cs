@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MonsterBuilder.Models.Monster;
 
@@ -27,7 +24,7 @@ namespace MonsterBuilder.Controllers
       var htmlDoc = new HtmlDocument();
       htmlDoc.LoadHtml(responseBody);
 
-      var monster = new Builders.MonsterFactory(responseBody).ShowData().Build();
+      var monster = new Builders.MonsterFactory(responseBody).Build();
 
       return monster;
     }
