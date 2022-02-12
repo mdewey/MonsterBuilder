@@ -48,6 +48,7 @@ namespace MonsterBuilder.Builders
       rv = this.BuildSpeed(rv);
       rv = this.BuildAttacks(rv);
       rv = this.BuildGear(rv);
+      rv = this.BuildSpellLikeAbilities(rv);
       return rv;
     }
 
@@ -63,8 +64,6 @@ namespace MonsterBuilder.Builders
       var dataPoint = data[position].InnerHtml;
       while (dataPoint.Trim() != "Description")
       {
-        Console.WriteLine("*****");
-        Console.WriteLine(dataPoint);
         AbilityDescription ad = null;
         if (dataPoint.Contains("(Ex)") || dataPoint.Contains("(Su)") || dataPoint.Contains("(Sp)"))
         {
@@ -84,6 +83,77 @@ namespace MonsterBuilder.Builders
         }
         rv.Abilities.AbilityDescriptions.Add(ad);
         dataPoint = data[position].InnerHtml;
+      }
+      return rv;
+    }
+
+    private Monster BuildSpellLikeAbilities(Monster rv)
+    {
+      var pos = findStartIndex("Spell-Like Abilities");
+      // caster level and concentraion
+      if (pos.HasValue)
+      {
+        var cl = data[pos.GetValueOrDefault() + 1].InnerHtml.Replace("(", "").Replace(")", "");
+        var casterLevelDetails = cl.Split(';').ToList();
+        rv.SpellLikeAbilities.CasterLevel = casterLevelDetails[0];
+        if (casterLevelDetails.Count > 1)
+        {
+          rv.SpellLikeAbilities.Concentration = casterLevelDetails[1].Replace("concentration", "").Trim();
+        }
+        pos += 2;
+        var dataPoint = data[pos.GetValueOrDefault()].InnerHtml;
+        SpellLikeAbilityLevel bucket = null;
+        SpellLikeAbility spell = null;
+        var dcRegex = new Regex("DC [0-9][0-9]");
+        var paramRegex = new Regex(@"\(.*\)");
+        while (dataPoint.Trim() != "Statistics")
+        {
+          if (dataPoint.Contains("/") || dataPoint.Contains("At will"))
+          {
+            if (bucket != null)
+            {
+              if (spell != null)
+              {
+                bucket.Spells.Add(spell);
+                spell = null;
+              }
+              rv.SpellLikeAbilities.SpellsKnown.Add(bucket);
+
+            }
+            bucket = new SpellLikeAbilityLevel();
+            bucket.Frequency = dataPoint;
+          }
+          else if (dcRegex.Match(dataPoint).Success)
+          {
+            spell.DC = dataPoint;
+          }
+          else if (paramRegex.Match(dataPoint).Success)
+          {
+            spell.Name += dataPoint.Trim();
+          }
+          else if (dataPoint.Trim() != ",")
+          {
+            if (spell != null)
+            {
+              bucket.Spells.Add(spell);
+            }
+            spell = new SpellLikeAbility();
+            spell.Name = dataPoint;
+          }
+          pos += 1;
+          dataPoint = data[pos.GetValueOrDefault()].InnerHtml;
+        }
+
+
+        // add the last ones
+        if (spell != null)
+        {
+          bucket.Spells.Add(spell);
+        }
+        if (bucket != null)
+        {
+          rv.SpellLikeAbilities.SpellsKnown.Add(bucket);
+        }
       }
       return rv;
     }
@@ -109,12 +179,7 @@ namespace MonsterBuilder.Builders
           rv.Gear.Other.AddRange(raw);
           otherStart++;
         }
-
-
-
-
       }
-
       return rv;
     }
 
@@ -125,8 +190,6 @@ namespace MonsterBuilder.Builders
       rv.Movements = data[index].InnerHtml.Split(",").Select(s => s.Trim()).ToList();
       return rv;
     }
-
-
     private Monster BuildAttacks(Monster rv)
     {
       var melee = findStartIndex("Melee");
@@ -202,7 +265,7 @@ namespace MonsterBuilder.Builders
         }
         if (current.Length > 0)
         {
-          rv.Attacks.Special.Add(current);
+          rv.Attacks.Special.Add(current.Trim());
         }
       }
       return rv;
@@ -243,7 +306,8 @@ namespace MonsterBuilder.Builders
       var aura = findStartIndex("Aura");
       if (aura.HasValue)
       {
-        monster.Abilities.Aura = $"{data[aura.GetValueOrDefault() + 1].InnerHtml},{data[aura.GetValueOrDefault() + 2].InnerHtml.Trim()}";
+        // NOTE: why did I have +2 here? Its removed now, but....hmmmmm.
+        monster.Abilities.Aura = $"{data[aura.GetValueOrDefault() + 1].InnerHtml}";
       }
 
 
@@ -284,7 +348,7 @@ namespace MonsterBuilder.Builders
       monster.Summary.Senses = data[initIndex + 3].InnerHtml.Trim();
       if (details.Contains($"("))
       {
-        monster.Summary.SubType = details.Substring(details.IndexOf($"("));
+        monster.Summary.SubType = details.Substring(details.IndexOf($"(")).Trim();
       }
 
       var space = findStartIndex("Space");
@@ -341,7 +405,7 @@ namespace MonsterBuilder.Builders
       var srIndex = findStartIndex("SR");
       if (srIndex.HasValue)
       {
-        monster.Defenses.SpellResistance = int.Parse(data[srIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", ""));
+        monster.Defenses.SpellResistance = int.Parse(data[srIndex.GetValueOrDefault() + 1].InnerHtml.Replace(";", "").Trim());
       }
       var immuneIndex = findStartIndex("Immune");
       if (immuneIndex.HasValue)
@@ -356,9 +420,6 @@ namespace MonsterBuilder.Builders
       }
       return monster;
     }
-
-
-
     private int parseInt(string raw)
     {
       var rv = 0;
