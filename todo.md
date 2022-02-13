@@ -1,6 +1,5 @@
-TODO:
+# TODO
 
-- CORS
 - error handling + logging of attempt
 - DNS
 - Refine search
