@@ -8,6 +8,9 @@ namespace MonsterBuilder
 {
   public class Startup
   {
+
+    public const string ALLOW_ALL_CORS = "ALLOW/ALL";
+
     public Startup(IConfiguration configuration)
     {
       Configuration = configuration;
@@ -19,8 +22,16 @@ namespace MonsterBuilder
     public void ConfigureServices(IServiceCollection services)
     {
 
+      services.AddCors(options =>
+             {
+               options.AddPolicy(ALLOW_ALL_CORS, builder =>
+               {
+                 builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials();
+               });
+             });
       services.AddControllersWithViews();
       services.AddSwaggerGen();
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,6 +53,7 @@ namespace MonsterBuilder
         opts.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
         opts.RoutePrefix = string.Empty;
       });
+      app.UseCors(ALLOW_ALL_CORS);
       app.UseHttpsRedirection();
       app.UseStaticFiles();
 
