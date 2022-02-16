@@ -22,7 +22,7 @@ namespace MonsterBuilder.Controllers
       response.EnsureSuccessStatusCode();
       string responseBody = await response.Content.ReadAsStringAsync();
 
-      var results = new SearchResults(responseBody).Build();
+      var results = new SearchResults(responseBody).ShowData().Build();
 
       return results;
     }
@@ -33,7 +33,7 @@ namespace MonsterBuilder.Controllers
       var url = $"https://www.aonprd.com/Search.aspx?Query={needle}&Filter=000000010000000000&AllTerms=True&OneLine=False&ExcludeAPModule=False&PFSLegalOnly=False";
       var results = await GetSearchResults(url);
       results.Needle = needle;
-      return Ok(new { results });
+      return Ok(results);
     }
   }
 }

@@ -29,7 +29,7 @@ namespace MonsterBuilder.Builders
       var i = 0;
       foreach (var item in data)
       {
-        Console.WriteLine($"{i}=>{item.InnerText}");
+        Console.WriteLine($"{i}=>{item.InnerHtml}");
         Console.WriteLine("-------");
         i++;
       }
@@ -41,9 +41,19 @@ namespace MonsterBuilder.Builders
       var rv = new Haystack();
       var resultsPosition = findStartIndex("Monsters");
       rv.Results = data
-        .Skip(resultsPosition.GetValueOrDefault())
+        .Skip(resultsPosition.GetValueOrDefault() + 1)
         .Where(w => w.InnerText.Trim() != ",")
-        .Select(s => new Result { Name = s.InnerText })
+        .Select(s =>
+          new Result
+          {
+            Name = s.InnerText,
+            Slug = s
+              .ChildNodes
+              .FirstOrDefault()?
+              .GetAttributeValue("href", null)?
+              .Replace("MonsterDisplay.aspx?ItemName=", "")
+          })
+        .Take(15)
         .ToList();
       return rv;
     }

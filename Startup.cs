@@ -26,7 +26,7 @@ namespace MonsterBuilder
              {
                options.AddPolicy(ALLOW_ALL_CORS, builder =>
                {
-                 builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials();
+                 builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
                });
              });
       services.AddControllersWithViews();
