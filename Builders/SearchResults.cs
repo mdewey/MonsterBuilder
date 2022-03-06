@@ -53,6 +53,8 @@ namespace MonsterBuilder.Builders
               .GetAttributeValue("href", null)?
               .Replace("MonsterDisplay.aspx?ItemName=", "")
           })
+        .Where(w => (!w.Slug?.Contains("Mythic")).GetValueOrDefault())
+        .Where(w => (!w.Slug?.Contains("Templates")).GetValueOrDefault())
         .Take(15)
         .ToList();
       return rv;
