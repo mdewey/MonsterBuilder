@@ -179,6 +179,14 @@ namespace MonsterBuilder.Builders
           otherStart++;
         }
       }
+
+      var treasureIndex = findStartIndex("Treasure");
+      if (treasureIndex.HasValue)
+      {
+        var treasureStart = treasureIndex.GetValueOrDefault() + 1;
+        rv.Gear.Treasure = data[treasureStart].InnerHtml.Trim();
+        return rv;
+      }
       return rv;
     }
 
